@@ -1,6 +1,5 @@
 package ems.gui;
 
-import ems.model.Department;
 import ems.model.EmployeeRecord;
 import ems.service.DataPersistenceException;
 import ems.service.EmployeeService;
