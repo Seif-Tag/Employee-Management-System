@@ -2,6 +2,7 @@ package ems.gui;
 
 import ems.model.Department;
 import ems.model.EmployeeRecord;
+import ems.service.DataPersistenceException;
 import ems.service.EmployeeService;
 
 import javax.swing.BorderFactory;
@@ -156,7 +157,13 @@ public class ViewEmployeesPanel extends JPanel {
             return;
         }
 
-        employeeService.deleteEmployee(selected.getEmployeeId());
+        try {
+            employeeService.deleteEmployee(selected.getEmployeeId());
+        } catch (DataPersistenceException e) {
+            JOptionPane.showMessageDialog(this, "Could not save data: " + e.getMessage(),
+                    "Save Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         refreshTable();
     }
 

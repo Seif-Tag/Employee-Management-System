@@ -39,6 +39,7 @@ class EmployeeTable extends JPanel {
         setLayout(new BorderLayout());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setFillsViewportHeight(true);
         table.setPreferredScrollableViewportSize(new Dimension(600, 160));
         add(new JScrollPane(table), BorderLayout.CENTER);
     }

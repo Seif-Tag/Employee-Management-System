@@ -1,6 +1,7 @@
 package ems.gui;
 
 import ems.model.Department;
+import ems.service.DataPersistenceException;
 import ems.service.EmployeeService;
 
 import javax.swing.BorderFactory;
@@ -76,6 +77,11 @@ public class DepartmentManagementPanel extends JPanel {
             showError("Department name is required.");
             return;
         }
+        Integer numericId = parsePositiveInteger(departmentId);
+        if (numericId == null) {
+            showError("Department ID must be a positive whole number.");
+            return;
+        }
         if (employeeService.isDepartmentIdTaken(departmentId)) {
             showError("Department ID \"" + departmentId + "\" is already in use.");
             return;
@@ -86,7 +92,13 @@ public class DepartmentManagementPanel extends JPanel {
             return;
         }
 
-        employeeService.addDepartment(departmentId, departmentName);
+        try {
+            employeeService.addDepartment(departmentId, departmentName);
+        } catch (DataPersistenceException e) {
+            JOptionPane.showMessageDialog(this, "Could not save data: " + e.getMessage(),
+                    "Save Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         departmentIdField.setText("");
         departmentNameField.setText("");
@@ -104,6 +116,15 @@ public class DepartmentManagementPanel extends JPanel {
                     department.getDepartmentId(),
                     department.getDepartmentName()
             });
+        }
+    }
+
+    private Integer parsePositiveInteger(String text) {
+        try {
+            int value = Integer.parseInt(text.trim());
+            return value > 0 ? value : null;
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

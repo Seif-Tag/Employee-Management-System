@@ -1,9 +1,11 @@
 package com.mycompany.lab_7;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class DepartmentManager {
 
     private ArrayList<Department> departments;
+    private FileHandler fileHandler = new FileHandler();
 
     public DepartmentManager() {
         departments = new ArrayList<>();
@@ -13,9 +15,16 @@ public class DepartmentManager {
         departments.add(new Department(4, "Marketing"));
         departments.add(new Department(5, "Sales"));
         }
-    
 
-    public void addDepartment(Department department) {
+    /** Loads saved departments; keeps the defaults when no file exists yet. */
+    public void loadData() throws IOException, ClassNotFoundException {
+        ArrayList<Department> saved = fileHandler.loadDepartments();
+        if (!saved.isEmpty()) {
+            departments = saved;
+        }
+    }
+
+    public void addDepartment(Department department) throws IOException {
 
         if (department == null) {
             throw new IllegalArgumentException("Invalid department.");
@@ -48,12 +57,11 @@ public class DepartmentManager {
         }
 
         departments.add(department);
-        System.out.println("Department added successfully!");
+        fileHandler.saveDepartments(departments);
     }
 
     public ArrayList<Department> getDepartments() {
         return departments;
     }
 }
-
 

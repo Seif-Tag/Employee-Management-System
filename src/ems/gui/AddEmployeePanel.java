@@ -1,6 +1,7 @@
 package ems.gui;
 
 import ems.model.Department;
+import ems.service.DataPersistenceException;
 import ems.service.EmployeeService;
 
 import javax.swing.BorderFactory;
@@ -10,6 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -65,7 +67,9 @@ public class AddEmployeePanel extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        add(buildFormPanel(), BorderLayout.CENTER);
+        JScrollPane formScroll = new JScrollPane(buildFormPanel());
+        formScroll.setBorder(BorderFactory.createEmptyBorder());
+        add(formScroll, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
 
         updateSalaryFields();
@@ -178,32 +182,38 @@ public class AddEmployeePanel extends JPanel {
 
         String departmentName = department.toString();
 
-        if (FULL_TIME.equals(employeeType)) {
-            Double basicSalary = parseDecimal(basicSalaryField.getText());
-            if (basicSalary == null || basicSalary < 0) {
-                showError("Basic monthly salary must be a non-negative number.");
-                return;
+        try {
+            if (FULL_TIME.equals(employeeType)) {
+                Double basicSalary = parseDecimal(basicSalaryField.getText());
+                if (basicSalary == null || basicSalary < 0) {
+                    showError("Basic monthly salary must be a non-negative number.");
+                    return;
+                }
+                Double bonus = parseDecimal(bonusField.getText());
+                if (bonus == null || bonus < 0) {
+                    showError("Monthly bonus must be a non-negative number.");
+                    return;
+                }
+                employeeService.addFullTimeEmployee(employeeId, fullName, age, departmentName,
+                        position, basicSalary, bonus);
+            } else {
+                Double hourlyRate = parseDecimal(hourlyRateField.getText());
+                if (hourlyRate == null || hourlyRate < 0) {
+                    showError("Hourly rate must be a non-negative number.");
+                    return;
+                }
+                Double hoursWorked = parseDecimal(hoursField.getText());
+                if (hoursWorked == null || hoursWorked < 0) {
+                    showError("Hours worked per month must be a non-negative number.");
+                    return;
+                }
+                employeeService.addPartTimeEmployee(employeeId, fullName, age, departmentName,
+                        position, hourlyRate, hoursWorked);
             }
-            Double bonus = parseDecimal(bonusField.getText());
-            if (bonus == null || bonus < 0) {
-                showError("Monthly bonus must be a non-negative number.");
-                return;
-            }
-            employeeService.addFullTimeEmployee(employeeId, fullName, age, departmentName,
-                    position, basicSalary, bonus);
-        } else {
-            Double hourlyRate = parseDecimal(hourlyRateField.getText());
-            if (hourlyRate == null || hourlyRate < 0) {
-                showError("Hourly rate must be a non-negative number.");
-                return;
-            }
-            Double hoursWorked = parseDecimal(hoursField.getText());
-            if (hoursWorked == null || hoursWorked < 0) {
-                showError("Hours worked per month must be a non-negative number.");
-                return;
-            }
-            employeeService.addPartTimeEmployee(employeeId, fullName, age, departmentName,
-                    position, hourlyRate, hoursWorked);
+        } catch (DataPersistenceException e) {
+            JOptionPane.showMessageDialog(this, "Could not save data: " + e.getMessage(),
+                    "Save Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         JOptionPane.showMessageDialog(this, "Employee added successfully!",

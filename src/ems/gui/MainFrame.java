@@ -5,6 +5,7 @@ import ems.service.EmployeeService;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import java.awt.Dimension;
 
 /**
  * Main application window. Hosts the section navigation and the dashboard,
@@ -47,6 +48,7 @@ public class MainFrame extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 650);
+        setMinimumSize(new Dimension(900, 600));
         setLocationRelativeTo(null);
     }
 

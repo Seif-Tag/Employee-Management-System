@@ -6,25 +6,33 @@ import ems.model.EmployeeRecord;
 import java.util.List;
 
 /**
- * Temporary employee and department service contract. The real backend
- * (domain objects and file storage) will replace this stub without changing
- * the UI code.
+ * Employee and department service contract shared by every GUI panel.
+ * Implementations persist through the file-backed backend; failures while
+ * saving or loading are reported as the unchecked
+ * {@link DataPersistenceException} so the GUI can show a dialog instead of
+ * crashing. Implementations contain no UI code.
  */
 public interface EmployeeService {
+
+    /**
+     * Loads previously saved employees and departments from disk. Called once
+     * at startup; a failure is raised as {@link DataPersistenceException}.
+     */
+    void loadData();
 
     /** Returns every department, in insertion order. */
     List<Department> getDepartments();
 
-    /** Temporary mock uniqueness check for department IDs. */
+    /** Uniqueness check for department IDs, ignoring non-numeric IDs. */
     boolean isDepartmentIdTaken(String departmentId);
 
-    /** Temporary mock uniqueness check for department names, ignoring letter case. */
+    /** Uniqueness check for department names, ignoring letter case. */
     boolean isDepartmentNameTaken(String departmentName);
 
     /** Adds a department; the caller must have validated ID and name uniqueness. */
     void addDepartment(String departmentId, String departmentName);
 
-    /** Temporary mock uniqueness check for employee IDs. */
+    /** Uniqueness check for employee IDs. */
     boolean isEmployeeIdTaken(int employeeId);
 
     void addFullTimeEmployee(int employeeId, String fullName, int age, String department,
